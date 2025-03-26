@@ -26,7 +26,7 @@ current_price = st.number_input("Введите актуальную цену н
 
 if st.button("Сделать прогноз"):
     try:
-        # Подготовка истории для лагов
+        # Подготовка истории
         if len(data_oned) >= 6:
             hist_data = data_oned[data_oned['dt'] <= pd.to_datetime(input_date)]
             if len(hist_data) >= 6:
@@ -40,7 +40,7 @@ if st.button("Сделать прогноз"):
         prices = [current_price]
         max_multiplier = 1
         current_multiplier = 1
-        stop_multiplier = False  # Флаг остановки расчёта множителя
+        stop_multiplier = False 
 
         # Прогноз на 6 недель
         for i in range(6):
@@ -54,7 +54,7 @@ if st.button("Сделать прогноз"):
                 'lag_6': [history[-6]]
             })
 
-            # Прогноз модели
+            # Прогноз
             base_pred = model.predict(X_pred)[0]
             pred = adjust_price(base_pred, current_price)
 
@@ -66,7 +66,7 @@ if st.button("Сделать прогноз"):
                 if pred > prices[-1]:
                     current_multiplier += 1
                 else:
-                    stop_multiplier = True  # Как только цена идёт вверх — фиксируем X
+                    stop_multiplier = True  # Как только цена идёт вверх фиксируем X
 
             max_multiplier = max(max_multiplier, current_multiplier)
 
