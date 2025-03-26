@@ -61,12 +61,12 @@ if st.button("Сделать прогноз"):
             # Определение даты
             pred_date = dates[-1] + timedelta(weeks=1)
 
-            # Логика расчёта множителя X
+            # Логика расчета множителя X
             if not stop_multiplier:
                 if pred > prices[-1]:
                     current_multiplier += 1
                 else:
-                    stop_multiplier = True  # Как только цена идёт вверх фиксируем X
+                    stop_multiplier = True  # Как только цена идет вверх фиксируем X
 
             max_multiplier = max(max_multiplier, current_multiplier)
 
