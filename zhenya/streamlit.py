@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import numpy as np
 from datetime import datetime, timedelta
 from catboost import CatBoostRegressor
 
-# Функция корректировки прогноза с учётом даты и введённой цены
+# Функция корректировки прогноза
 def adjust_price(base_pred, input_price, tolerance=0.2, user_weight=0.9):
     """Корректировка в сторону введённой цены"""
     if abs(input_price - base_pred) / input_price > tolerance:
@@ -12,10 +13,10 @@ def adjust_price(base_pred, input_price, tolerance=0.2, user_weight=0.9):
     return base_pred
 
 # Загрузка данных и модели
-data_oned = pd.read_csv("../data/price_data.csv", parse_dates=['dt'])
+data_oned = pd.read_csv("intensiv-3-main\data\price_data.csv", parse_dates=['dt'])
 data_oned = data_oned.sort_values('dt').reset_index(drop=True)
 
-model = joblib.load("../models/model_oned.pkl")
+model = joblib.load("intensiv-3-main\models\model_oned.pkl")
 
 st.title("Прогноз цены и уровень закупки арматуры")
 
@@ -43,7 +44,6 @@ if st.button("Сделать прогноз"):
 
         # Прогноз на 6 недель
         for i in range(6):
-            # Формируем датафрейм с лагами
             X_pred = pd.DataFrame({
                 'lag_1': [history[-1]],
                 'lag_2': [history[-2]],
@@ -57,7 +57,6 @@ if st.button("Сделать прогноз"):
             base_pred = model.predict(X_pred)[0]
             pred = adjust_price(base_pred, current_price)
 
-            # Определение даты
             pred_date = dates[-1] + timedelta(weeks=1)
 
             # Логика расчета множителя X
@@ -65,7 +64,7 @@ if st.button("Сделать прогноз"):
                 if pred > prices[-1]:
                     current_multiplier += 1
                 else:
-                    stop_multiplier = True  # Как только цена идет вверх фиксируем X
+                    stop_multiplier = True  # Как только цена идет вниз фиксируем X
 
             max_multiplier = max(max_multiplier, current_multiplier)
 
